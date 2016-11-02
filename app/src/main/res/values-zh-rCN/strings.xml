@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">营销助手</string>
+    <string name="inst_title_start">启动%1$s</string>
+</resources>

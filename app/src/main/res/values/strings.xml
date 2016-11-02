@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Marketing Assistant</string>
+    <string name="inst_title_start">Start %1$s</string>
+</resources>
