@@ -1,50 +1,35 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <EditTextPreference
-        android:inputType="phone"
-        android:maxLength="11"
-        android:key="phone_number_1"
-        android:selectAllOnFocus="true"
-        android:singleLine="true"
-        android:title="@string/pref_title_phone_number_1" />
-    <EditTextPreference
-        android:inputType="phone"
-        android:maxLength="11"
-        android:key="phone_number_2"
-        android:selectAllOnFocus="true"
-        android:singleLine="true"
-        android:title="@string/pref_title_phone_number_2" />
     <SwitchPreference
         android:defaultValue="false"
-        android:key="add_contacts_from_first"
-        android:title="@string/pref_title_add_contacts_from_first"
-        android:summary="@string/pref_summary_add_contacts_from_first" />
+        android:key="add_contact_from_first"
+        android:title="@string/pref_title_reset_added_account_list" />
     <EditTextPreference
-        android:defaultValue="@string/pref_default_add_contacts_count"
+        android:defaultValue="@string/pref_default_add_contact_count"
         android:inputType="number"
-        android:key="add_contacts_count"
+        android:key="add_contact_count"
         android:selectAllOnFocus="true"
         android:singleLine="true"
-        android:title="@string/pref_title_add_contacts_count" />
+        android:title="@string/pref_title_add_contact_count" />
     <EditTextPreference
-        android:key="add_contacts_greeting_1"
+        android:key="add_contact_greeting_1"
         android:selectAllOnFocus="true"
         android:singleLine="true"
-        android:title="@string/pref_title_add_contacts_greeting_1" />
+        android:title="@string/pref_title_add_contact_greeting_1" />
     <EditTextPreference
-        android:key="add_contacts_greeting_2"
+        android:key="add_contact_greeting_2"
         android:selectAllOnFocus="true"
         android:singleLine="true"
-        android:title="@string/pref_title_add_contacts_greeting_2" />
+        android:title="@string/pref_title_add_contact_greeting_2" />
     <EditTextPreference
-        android:key="add_contacts_greeting_3"
+        android:key="add_contact_greeting_3"
         android:selectAllOnFocus="true"
         android:singleLine="true"
-        android:title="@string/pref_title_add_contacts_greeting_3" />
+        android:title="@string/pref_title_add_contact_greeting_3" />
     <EditTextPreference
-        android:key="add_contacts_greeting_4"
+        android:key="add_contact_greeting_4"
         android:selectAllOnFocus="true"
         android:singleLine="true"
-        android:title="@string/pref_title_add_contacts_greeting_4" />
+        android:title="@string/pref_title_add_contact_greeting_4" />
 
 </PreferenceScreen>

@@ -4,10 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/MarketingAssistant.iml" filepath="$PROJECT_DIR$/MarketingAssistant.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/lib/lib.iml" filepath="$PROJECT_DIR$/lib/lib.iml" />
-      <module fileurl="file://$PROJECT_DIR$/lib/lib.iml" filepath="$PROJECT_DIR$/lib/lib.iml" />
-      <module fileurl="file://$PROJECT_DIR$/plugin-qq/plugin-qq.iml" filepath="$PROJECT_DIR$/plugin-qq/plugin-qq.iml" />
       <module fileurl="file://$PROJECT_DIR$/plugin-qq/plugin-qq.iml" filepath="$PROJECT_DIR$/plugin-qq/plugin-qq.iml" />
     </modules>
   </component>

@@ -7,32 +7,32 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.InstrumentationInfo;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.os.UserHandle;
 import android.support.v4.app.ListFragment;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.example.marketing.common.Authentication;
+import com.example.marketing.common.CommonInterface;
 import com.example.marketing.plugin.PluginIntent;
 
 public class MainActivity extends AppCompatActivity {
 
-    private Authentication mAuthentication;
+    private CommonInterface mInterface;
 
     private ServiceConnection mServiceConnection = new ServiceConnection() {
 
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            mAuthentication = Authentication.Stub.asInterface(service);
+            mInterface = CommonInterface.Stub.asInterface(service);
             boolean allowed = false;
             try {
-                allowed = mAuthentication.checkPermission();
+                allowed = mInterface.checkPermission();
             } catch (RemoteException e) {
                 // Nothing to do
             }
@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
-            mAuthentication = null;
+            mInterface = null;
         }
     };
 
@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
             getSupportFragmentManager().beginTransaction().add(android.R.id.content, list).commit();
         }
 
-        Intent intent = new Intent(this, AuthenticationService.class);
+        Intent intent = new Intent(this, CommonService.class);
         bindService(intent, mServiceConnection, BIND_AUTO_CREATE);
     }
 

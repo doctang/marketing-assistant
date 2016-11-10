@@ -2,14 +2,11 @@
 <resources>
     <string name="app_name">QQ插件</string>
     <string name="title_activity_settings">设置</string>
-    <string name="pref_title_phone_number_1">电话卡1号码</string>
-    <string name="pref_title_phone_number_2">电话卡2号码</string>
-    <string name="pref_title_add_contacts_count">添加好友数量</string>
-    <string name="pref_title_add_contacts_greeting_1">添加好友问候语1</string>
-    <string name="pref_title_add_contacts_greeting_2">添加好友问候语2</string>
-    <string name="pref_title_add_contacts_greeting_3">添加好友问候语3</string>
-    <string name="pref_title_add_contacts_greeting_4">添加好友问候语4</string>
-    <string name="pref_title_add_contacts_from_first">从头开始添加</string>
-    <string name="pref_summary_add_contacts_from_first">清空已添加好友列表</string>
+    <string name="pref_title_add_contact_count">添加好友数量</string>
+    <string name="pref_title_add_contact_greeting_1">添加好友问候语1</string>
+    <string name="pref_title_add_contact_greeting_2">添加好友问候语2</string>
+    <string name="pref_title_add_contact_greeting_3">添加好友问候语3</string>
+    <string name="pref_title_add_contact_greeting_4">添加好友问候语4</string>
+    <string name="pref_title_reset_added_account_list">重置已添加账号列表</string>
     <string name="menu_title_start">启动</string>
 </resources>

@@ -15,6 +15,8 @@ import android.support.test.uiautomator.UiSelector;
 import android.support.test.uiautomator.Until;
 import android.widget.TextView;
 
+import java.io.IOException;
+
 import static android.support.test.InstrumentationRegistry.getContext;
 import static android.support.test.InstrumentationRegistry.getInstrumentation;
 import static org.hamcrest.Matchers.notNullValue;
@@ -70,7 +72,15 @@ public class AutomatorHelper {
         return getBitmap(obj.getVisibleBounds());
     }
 
-    public void launchApp(String packageName) {
+    public void launchApp(String packageName, boolean forceStop) {
+        if (forceStop) {
+            try {
+                mDevice.executeShellCommand("am force-stop " + packageName);
+            } catch (IOException e) {
+                // Nothing to do
+            }
+        }
+
         // Launch the app
         Context context = getContext();
         final Intent intent = context.getPackageManager().getLaunchIntentForPackage(packageName);

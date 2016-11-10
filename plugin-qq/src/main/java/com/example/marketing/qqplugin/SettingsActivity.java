@@ -14,13 +14,11 @@ import android.support.v7.app.ActionBar;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import static com.example.marketing.qqplugin.AddContacts.KEY_ADD_CONTACTS_COUNT;
-import static com.example.marketing.qqplugin.AddContacts.KEY_ADD_CONTACTS_GREETING1;
-import static com.example.marketing.qqplugin.AddContacts.KEY_ADD_CONTACTS_GREETING2;
-import static com.example.marketing.qqplugin.AddContacts.KEY_ADD_CONTACTS_GREETING3;
-import static com.example.marketing.qqplugin.AddContacts.KEY_ADD_CONTACTS_GREETING4;
-import static com.example.marketing.qqplugin.AddContacts.KEY_PHONE_NUMBER_1;
-import static com.example.marketing.qqplugin.AddContacts.KEY_PHONE_NUMBER_2;
+import static com.example.marketing.qqplugin.AddContacts.KEY_ADD_CONTACT_COUNT;
+import static com.example.marketing.qqplugin.AddContacts.KEY_ADD_CONTACT_GREETING1;
+import static com.example.marketing.qqplugin.AddContacts.KEY_ADD_CONTACT_GREETING2;
+import static com.example.marketing.qqplugin.AddContacts.KEY_ADD_CONTACT_GREETING3;
+import static com.example.marketing.qqplugin.AddContacts.KEY_ADD_CONTACT_GREETING4;
 
 /**
  * A {@link PreferenceActivity} that presents a set of application settings. On
@@ -168,13 +166,11 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             // to their values. When their values change, their summaries are
             // updated to reflect the new value, per the Android Design
             // guidelines.
-            bindPreferenceSummaryToValue(findPreference(KEY_PHONE_NUMBER_1));
-            bindPreferenceSummaryToValue(findPreference(KEY_PHONE_NUMBER_2));
-            bindPreferenceSummaryToValue(findPreference(KEY_ADD_CONTACTS_COUNT));
-            bindPreferenceSummaryToValue(findPreference(KEY_ADD_CONTACTS_GREETING1));
-            bindPreferenceSummaryToValue(findPreference(KEY_ADD_CONTACTS_GREETING2));
-            bindPreferenceSummaryToValue(findPreference(KEY_ADD_CONTACTS_GREETING3));
-            bindPreferenceSummaryToValue(findPreference(KEY_ADD_CONTACTS_GREETING4));
+            bindPreferenceSummaryToValue(findPreference(KEY_ADD_CONTACT_COUNT));
+            bindPreferenceSummaryToValue(findPreference(KEY_ADD_CONTACT_GREETING1));
+            bindPreferenceSummaryToValue(findPreference(KEY_ADD_CONTACT_GREETING2));
+            bindPreferenceSummaryToValue(findPreference(KEY_ADD_CONTACT_GREETING3));
+            bindPreferenceSummaryToValue(findPreference(KEY_ADD_CONTACT_GREETING4));
         }
 
         @Override

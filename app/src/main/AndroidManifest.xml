@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.marketing.assistant">
 
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
     <application
@@ -22,11 +23,11 @@
         </activity>
 
         <service
-            android:name=".AuthenticationService"
+            android:name=".CommonService"
             android:enabled="true"
             android:exported="true">
             <intent-filter>
-                <action android:name="com.example.marketing.plugin.intent.action.AUTHENTICATE" />
+                <action android:name="com.example.marketing.plugin.intent.action.COMMON_INTERFACE" />
             </intent-filter>
         </service>
     </application>

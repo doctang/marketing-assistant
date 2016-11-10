@@ -4,16 +4,13 @@
 
     <!-- Strings related to Settings -->
 
-    <string name="pref_title_phone_number_1">Sim card 1 phone number</string>
-    <string name="pref_title_phone_number_2">Sim card 2 phone number</string>
-    <string name="pref_title_add_contacts_count">Add friends count</string>
-    <string name="pref_default_add_contacts_count" translatable="false">4</string>
-    <string name="pref_title_add_contacts_greeting_1">Greeting 1</string>
-    <string name="pref_title_add_contacts_greeting_2">Greeting 2</string>
-    <string name="pref_title_add_contacts_greeting_3">Greeting 3</string>
-    <string name="pref_title_add_contacts_greeting_4">Greeting 4</string>
-    <string name="pref_title_add_contacts_from_first">Start again</string>
-    <string name="pref_summary_add_contacts_from_first">Add friends from first</string>
+    <string name="pref_title_add_contact_count">Add friends count</string>
+    <string name="pref_default_add_contact_count" translatable="false">4</string>
+    <string name="pref_title_add_contact_greeting_1">Greeting 1</string>
+    <string name="pref_title_add_contact_greeting_2">Greeting 2</string>
+    <string name="pref_title_add_contact_greeting_3">Greeting 3</string>
+    <string name="pref_title_add_contact_greeting_4">Greeting 4</string>
+    <string name="pref_title_reset_added_account_list">Reset added account list</string>
 
     <string name="menu_title_start">Start</string>
 </resources>
