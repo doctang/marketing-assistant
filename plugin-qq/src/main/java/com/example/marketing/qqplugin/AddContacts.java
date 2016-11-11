@@ -25,6 +25,7 @@ import android.test.suitebuilder.annotation.LargeTest;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 
 import com.example.marketing.common.CommonInterface;
 import com.example.marketing.plugin.Automator;
@@ -41,6 +42,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import static android.support.test.InstrumentationRegistry.getArguments;
 import static android.support.test.InstrumentationRegistry.getContext;
@@ -63,6 +65,7 @@ public class AddContacts extends Automator {
     private static final int SLOT_2 = 1;
 
     public static final String KEY_ADD_CONTACT_COUNT = "add_contact_count";
+    public static final String KEY_ADD_CONTACT_INTERVAL = "add_contact_interval";
     public static final String KEY_ADD_CONTACT_GREETING1 = "add_contact_greeting_1";
     public static final String KEY_ADD_CONTACT_GREETING2 = "add_contact_greeting_2";
     public static final String KEY_ADD_CONTACT_GREETING3 = "add_contact_greeting_3";
@@ -128,6 +131,17 @@ public class AddContacts extends Automator {
             Log.e(TAG, e.getMessage());
         }
         assertThat("好友验证发送数量无效", addContactCount, is(greaterThan(0)));
+
+        // 获取好友添加间隔参数
+        String interval = mPref.getString(KEY_ADD_CONTACT_INTERVAL,
+                getContext().getString(R.string.pref_default_add_contact_interval));
+        int addContactInterval = 0;
+        try {
+            addContactInterval = Integer.parseInt(args.getString(KEY_ADD_CONTACT_INTERVAL, interval));
+        } catch (NumberFormatException e) {
+            Log.e(TAG, e.getMessage());
+        }
+        assertThat("添加好友间隔无效", addContactInterval, is(greaterThan(0)));
 
         // 获取添加好友问候语参数
         String greeting1 = args.getString(KEY_ADD_CONTACT_GREETING1);
@@ -210,6 +224,11 @@ public class AddContacts extends Automator {
             mDevice.waitForIdle();
 
             for (int i = 0; i < addContactCount; i++) {
+                // 防止频繁添加
+                if (i > 0) {
+                    sleep(addContactInterval * 1000);
+                }
+
                 // 从可用电话号码列表中获取一个电话号码
                 String phoneNumber;
                 Iterator<String> it = mPhoneNumberList.iterator();
@@ -244,9 +263,14 @@ public class AddContacts extends Automator {
                 addHailFellow.clickAndWait(Until.newWindow(), WAIT_TIME);
                 mDevice.waitForIdle();
 
-                // 根据是否有必填来判断是否需要问答验证问题
+                // 拉取验证消息失败时播放警告铃声
                 UiObject2 input = mDevice.wait(Until.findObject(By.clazz(EditText.class)), WAIT_TIME);
-                assertThat("没有找到问候语输入框", input, notNullValue());
+                if (input == null) {
+                    playAlertRingtone();
+                    return;
+                }
+
+                // 根据是否有必填来判断是否需要问答验证问题
                 if ("必填".equals(input.getText())) {
                     // 从可用电话号码中去掉该号码
                     removePhoneNumber(phoneNumber);
@@ -298,18 +322,26 @@ public class AddContacts extends Automator {
             sleep();
 
             // 打开抽屉
-            while (true) {
-                UiObject2 head = mDevice.wait(
-                        Until.findObject(By.res(PACKAGE, "conversation_head")), WAIT_TIME);
-                if (head != null) {
-                    head.click();
-                    if (mDevice.wait(Until.hasObject(By.res(PACKAGE, "nickname")), WAIT_TIME)) {
-                        mDevice.waitForIdle();
-                        sleep();
-                        break;
-                    }
-                }
+            if (mDevice.wait(Until.hasObject(By.clazz(ProgressBar.class)), WAIT_TIME)) {
+                mDevice.wait(Until.gone(By.clazz(ProgressBar.class)), WAIT_TIME * 3);
             }
+            if (mDevice.hasObject(By.text("身份过期"))) {
+                playAlertRingtone();
+                return;
+            }
+            if (mDevice.wait(Until.hasObject(
+                    By.text(Pattern.compile("^(绑定手机通讯录|通讯录)$"))), WAIT_TIME)) {
+                UiObject2 msg = mDevice.findObject(
+                        By.res(Pattern.compile("^.*(ivTitleBtnLeft|ivTitleBtnLeftButton)$")));
+                assertThat("没有找到退出按钮", msg, notNullValue());
+                msg.clickAndWait(Until.newWindow(), WAIT_TIME);
+                mDevice.waitForIdle();
+            }
+            UiObject2 head = mDevice.findObject(By.res(PACKAGE, "conversation_head"));
+            assertThat("没有找到头像", head, notNullValue());
+            head.click();
+            mDevice.wait(Until.hasObject(By.res(PACKAGE, "nickname")), WAIT_TIME);
+            mDevice.waitForIdle();
 
             // 打开设置
             UiObject2 settings = mDevice.wait(Until.findObject(By.text("设置")), WAIT_TIME);

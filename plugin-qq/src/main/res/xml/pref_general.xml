@@ -12,6 +12,13 @@
         android:singleLine="true"
         android:title="@string/pref_title_add_contact_count" />
     <EditTextPreference
+        android:defaultValue="@string/pref_default_add_contact_interval"
+        android:inputType="number"
+        android:key="add_contact_interval"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title="@string/pref_title_add_contact_interval" />
+    <EditTextPreference
         android:key="add_contact_greeting_1"
         android:selectAllOnFocus="true"
         android:singleLine="true"

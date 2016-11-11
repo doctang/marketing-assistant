@@ -3,6 +3,7 @@
     <string name="app_name">QQ插件</string>
     <string name="title_activity_settings">设置</string>
     <string name="pref_title_add_contact_count">添加好友数量</string>
+    <string name="pref_title_add_contact_interval">添加好友间隔（秒）</string>
     <string name="pref_title_add_contact_greeting_1">添加好友问候语1</string>
     <string name="pref_title_add_contact_greeting_2">添加好友问候语2</string>
     <string name="pref_title_add_contact_greeting_3">添加好友问候语3</string>

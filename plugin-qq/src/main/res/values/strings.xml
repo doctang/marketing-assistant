@@ -6,6 +6,8 @@
 
     <string name="pref_title_add_contact_count">Add friends count</string>
     <string name="pref_default_add_contact_count" translatable="false">4</string>
+    <string name="pref_title_add_contact_interval">Add friends interval (seconds)</string>
+    <string name="pref_default_add_contact_interval" translatable="false">30</string>
     <string name="pref_title_add_contact_greeting_1">Greeting 1</string>
     <string name="pref_title_add_contact_greeting_2">Greeting 2</string>
     <string name="pref_title_add_contact_greeting_3">Greeting 3</string>
