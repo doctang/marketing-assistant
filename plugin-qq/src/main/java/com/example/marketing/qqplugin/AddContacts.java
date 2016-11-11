@@ -71,8 +71,10 @@ public class AddContacts extends Automator {
     public static final String KEY_ADDED_ACCOUNT_LIST = "added_account_list";
     public static final String KEY_PHONE_NUMBER_LIST = "phone_number_list";
 
-    private CommonInterface mInterface;
+    private SharedPreferences mPref = PreferenceManager.getDefaultSharedPreferences(getContext());
+    private Set<String> mPhoneNumberList;
 
+    private CommonInterface mInterface;
     private ServiceConnection mServiceConnection = new ServiceConnection() {
 
         @Override
@@ -85,6 +87,8 @@ public class AddContacts extends Automator {
             mInterface = null;
         }
     };
+
+    private int mSlot = 0;
 
     @Before
     @Override
@@ -113,12 +117,9 @@ public class AddContacts extends Automator {
             return;
         }
 
-        // 解析参数
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getContext());
-        Bundle args = getArguments();
-
         // 获取好友验证发送数量参数
-        String count = sp.getString(
+        Bundle args = getArguments();
+        String count = mPref.getString(
                 KEY_ADD_CONTACT_COUNT, getContext().getString(R.string.pref_default_add_contact_count));
         int addContactCount = 0;
         try {
@@ -131,19 +132,19 @@ public class AddContacts extends Automator {
         // 获取添加好友问候语参数
         String greeting1 = args.getString(KEY_ADD_CONTACT_GREETING1);
         if (TextUtils.isEmpty(greeting1)) {
-            greeting1 = sp.getString(KEY_ADD_CONTACT_GREETING1, "");
+            greeting1 = mPref.getString(KEY_ADD_CONTACT_GREETING1, "");
         }
         String greeting2 = args.getString(KEY_ADD_CONTACT_GREETING2);
         if (TextUtils.isEmpty(greeting2)) {
-            greeting2 = sp.getString(KEY_ADD_CONTACT_GREETING2, "");
+            greeting2 = mPref.getString(KEY_ADD_CONTACT_GREETING2, "");
         }
         String greeting3 = args.getString(KEY_ADD_CONTACT_GREETING3);
         if (TextUtils.isEmpty(greeting3)) {
-            greeting3 = sp.getString(KEY_ADD_CONTACT_GREETING3, "");
+            greeting3 = mPref.getString(KEY_ADD_CONTACT_GREETING3, "");
         }
         String greeting4 = args.getString(KEY_ADD_CONTACT_GREETING4);
         if (TextUtils.isEmpty(greeting4)) {
-            greeting4 = sp.getString(KEY_ADD_CONTACT_GREETING4, "");
+            greeting4 = mPref.getString(KEY_ADD_CONTACT_GREETING4, "");
         }
         final String[] greetings = { greeting1, greeting2, greeting3, greeting4 };
 
@@ -153,21 +154,20 @@ public class AddContacts extends Automator {
         if (value != null) {
             resetAddedAccountList = "true".equals(value);
         } else {
-            resetAddedAccountList = sp.getBoolean(KEY_RESET_ADDED_ACCOUNT_LIST, false);
+            resetAddedAccountList = mPref.getBoolean(KEY_RESET_ADDED_ACCOUNT_LIST, false);
         }
         if (resetAddedAccountList) {
-            sp.edit().remove(KEY_PHONE_NUMBER_LIST).apply();
-            sp.edit().remove(KEY_ADDED_ACCOUNT_LIST).apply();
-            sp.edit().putBoolean(KEY_RESET_ADDED_ACCOUNT_LIST, false).apply();
+            mPref.edit().remove(KEY_PHONE_NUMBER_LIST).apply();
+            mPref.edit().remove(KEY_ADDED_ACCOUNT_LIST).apply();
+            mPref.edit().putBoolean(KEY_RESET_ADDED_ACCOUNT_LIST, false).apply();
         }
 
         // 获取当前已添加过的QQ账号列表
-        Set<String> addedAccountList = sp.getStringSet(KEY_ADDED_ACCOUNT_LIST, new HashSet<String>());
+        Set<String> addedAccountList = mPref.getStringSet(KEY_ADDED_ACCOUNT_LIST, new HashSet<String>());
 
         // 获取当前可用的电话号码列表
-        Set<String> phoneNumberList;
-        if (sp.contains(KEY_PHONE_NUMBER_LIST)) {
-            phoneNumberList = sp.getStringSet(KEY_PHONE_NUMBER_LIST, new HashSet<String>());
+        if (mPref.contains(KEY_PHONE_NUMBER_LIST)) {
+            mPhoneNumberList = mPref.getStringSet(KEY_PHONE_NUMBER_LIST, new HashSet<String>());
         } else {
             List<String> list;
             try {
@@ -175,17 +175,16 @@ public class AddContacts extends Automator {
             } catch (RemoteException e) {
                 list = new ArrayList<>();
             }
-            phoneNumberList = new HashSet<>(list);
+            mPhoneNumberList = new HashSet<>(list);
         }
 
         // 切换到初始卡
-        int slot = 0;
-        switchSimCard(slot);
+        switchSimCard();
 
         // 遍历所有已登录的QQ账号
         while (true) {
             // 启动QQ应用
-            mHelper.launchApp(PACKAGE, true);
+            mHelper.launchApp(PACKAGE);
             mDevice.waitForIdle();
             sleep();
 
@@ -213,7 +212,7 @@ public class AddContacts extends Automator {
             for (int i = 0; i < addContactCount; i++) {
                 // 从可用电话号码列表中获取一个电话号码
                 String phoneNumber;
-                Iterator<String> it = phoneNumberList.iterator();
+                Iterator<String> it = mPhoneNumberList.iterator();
                 if (it.hasNext()) {
                     phoneNumber = it.next();
                 } else {
@@ -227,8 +226,17 @@ public class AddContacts extends Automator {
                 mDevice.waitForIdle();
                 UiObject2 search = mDevice.findObject(By.res(PACKAGE, "btn_cancel_search"));
                 assertThat("没有找到搜索按钮", search, notNullValue());
-                search.clickAndWait(Until.newWindow(), WAIT_TIME);
-                mDevice.waitForIdle();
+                search.click();
+                BySelector searching = By.textStartsWith("正在搜索");
+                mDevice.wait(Until.hasObject(searching), WAIT_TIME);
+                mDevice.wait(Until.gone(searching), WAIT_TIME);
+
+                // 如果没有找到结果则继续搜索下一个电话号码
+                if (mDevice.hasObject(By.desc("没有找到相关结果"))) {
+                    removePhoneNumber(phoneNumber);
+                    i--;
+                    continue;
+                }
 
                 // 点击加好友按钮
                 UiObject2 addHailFellow = mDevice.wait(Until.findObject(By.text("加好友")), WAIT_TIME);
@@ -236,10 +244,28 @@ public class AddContacts extends Automator {
                 addHailFellow.clickAndWait(Until.newWindow(), WAIT_TIME);
                 mDevice.waitForIdle();
 
-                // 输入随机问候语
-                UiObject2 input = mDevice.findObject(By.clazz(EditText.class));
+                // 根据是否有必填来判断是否需要问答验证问题
+                UiObject2 input = mDevice.wait(Until.findObject(By.clazz(EditText.class)), WAIT_TIME);
                 assertThat("没有找到问候语输入框", input, notNullValue());
-                input.setText(greetings[new Random().nextInt(greetings.length)]);
+                if ("必填".equals(input.getText())) {
+                    // 从可用电话号码中去掉该号码
+                    removePhoneNumber(phoneNumber);
+
+                    // 返回搜索
+                    UiObject2 back1 = mDevice.findObject(By.res(PACKAGE, "ivTitleBtnLeft").text("返回"));
+                    assertThat("没有找到返回按钮", back1, notNullValue());
+                    back1.clickAndWait(Until.newWindow(), WAIT_TIME);
+                    mDevice.waitForIdle();
+                    UiObject2 back2 = mDevice.findObject(By.res(PACKAGE, "ivTitleBtnLeft").text("返回"));
+                    assertThat("没有找到返回按钮", back2, notNullValue());
+                    back2.clickAndWait(Until.newWindow(), WAIT_TIME);
+                    mDevice.waitForIdle();
+                    i--;
+                    continue;
+                } else {
+                    // 输入随机问候语
+                    input.setText(greetings[new Random().nextInt(greetings.length)]);
+                }
 
                 // 点击下一步
                 UiObject2 next = mDevice.findObject(By.res(PACKAGE, "ivTitleBtnRightText").text("下一步"));
@@ -254,9 +280,7 @@ public class AddContacts extends Automator {
                 mDevice.waitForIdle();
 
                 // 从可用电话号码中去掉该号码
-                phoneNumberList.remove(phoneNumber);
-                sp.edit().remove(KEY_PHONE_NUMBER_LIST).apply();
-                sp.edit().putStringSet(KEY_PHONE_NUMBER_LIST, phoneNumberList).apply();
+                removePhoneNumber(phoneNumber);
 
                 // 点击返回
                 UiObject2 back = mDevice.findObject(By.res(PACKAGE, "ivTitleBtnLeft").text("返回"));
@@ -266,10 +290,10 @@ public class AddContacts extends Automator {
             }
 
             // 切卡及数据业务
-            switchSimCard(++slot % 2);
+            switchSimCard();
 
             // 再次启动QQ应用
-            mHelper.launchApp(PACKAGE, true);
+            mHelper.launchApp(PACKAGE);
             mDevice.waitForIdle();
             sleep();
 
@@ -305,8 +329,8 @@ public class AddContacts extends Automator {
             UiObject2 account = check.getParent().findObject(By.res(PACKAGE, "account"));
             assertThat("没有找到账号名称", account, notNullValue());
             addedAccountList.add(account.getText());
-            sp.edit().remove(KEY_ADDED_ACCOUNT_LIST).apply();
-            sp.edit().putStringSet(KEY_ADDED_ACCOUNT_LIST, addedAccountList).apply();
+            mPref.edit().remove(KEY_ADDED_ACCOUNT_LIST).apply();
+            mPref.edit().putStringSet(KEY_ADDED_ACCOUNT_LIST, addedAccountList).apply();
 
             // 滚动到底部
             UiScrollable list = new UiScrollable(new UiSelector().scrollable(true));
@@ -326,11 +350,11 @@ public class AddContacts extends Automator {
             // 若账号遍历完成则结束添加
             UiObject2 last = icons.get(index).getParent().findObject(By.res(PACKAGE, "account"));
             assertThat("没有找到最后一个账号", last, notNullValue());
-            if (addedAccountList.contains(last.getText())) {
-                break;
-            } else {
+            if (!addedAccountList.contains(last.getText())) {
                 last.click();
                 mDevice.wait(Until.hasObject(By.text("关联QQ号，同时接收多个帐号的消息。")), WAIT_TIME);
+            } else {
+                break;
             }
         }
     }
@@ -343,8 +367,15 @@ public class AddContacts extends Automator {
         getContext().unbindService(mServiceConnection);
     }
 
-    private void switchSimCard(int slot) {
-        mHelper.launchApp(Settings.PACKAGE, true);
+    private void removePhoneNumber(String phoneNumber) {
+        mPhoneNumberList.remove(phoneNumber);
+        mPref.edit().remove(KEY_PHONE_NUMBER_LIST).apply();
+        mPref.edit().putStringSet(KEY_PHONE_NUMBER_LIST, mPhoneNumberList).apply();
+    }
+
+    private void switchSimCard() {
+        int slot = mSlot++ % 2;
+        mHelper.launchApp(Settings.PACKAGE);
         mDevice.waitForIdle();
         sleep();
         mHelper.openMenu("双卡设置");
@@ -371,7 +402,7 @@ public class AddContacts extends Automator {
                 clickStkDialog();
             }
         }
-        mHelper.launchApp(Settings.PACKAGE, true);
+        mHelper.launchApp(Settings.PACKAGE);
         mDevice.waitForIdle();
         sleep();
         mHelper.openMenu("移动网络");

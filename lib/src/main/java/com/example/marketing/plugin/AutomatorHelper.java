@@ -91,6 +91,10 @@ public class AutomatorHelper {
         mDevice.wait(Until.hasObject(By.pkg(packageName).depth(0)), WAIT_TIME);
     }
 
+    public void launchApp(String packageName) {
+        launchApp(packageName, true);
+    }
+
     @SuppressWarnings("deprecation")
     public void openMenu(String title) {
         UiScrollable list = new UiScrollable(new UiSelector().scrollable(true));
