@@ -2,7 +2,7 @@
 
     <SwitchPreference
         android:defaultValue="false"
-        android:key="add_contact_from_first"
+        android:key="reset_added_account_list"
         android:title="@string/pref_title_reset_added_account_list" />
     <EditTextPreference
         android:defaultValue="@string/pref_default_add_contact_count"

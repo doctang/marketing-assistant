@@ -1,7 +1,11 @@
 package com.example.marketing.plugin;
 
+import android.support.test.uiautomator.By;
+import android.support.test.uiautomator.BySelector;
 import android.support.test.uiautomator.UiDevice;
+import android.support.test.uiautomator.UiObject2;
 import android.support.test.uiautomator.UiWatcher;
+import android.support.test.uiautomator.Until;
 
 import org.junit.After;
 import org.junit.Before;
@@ -9,6 +13,7 @@ import org.junit.Test;
 
 import static android.support.test.InstrumentationRegistry.getInstrumentation;
 import static android.support.test.internal.util.Checks.checkNotNull;
+import static com.example.marketing.plugin.AutomatorHelper.WAIT_TIME;
 
 public abstract class Automator implements UiWatcher {
 
@@ -17,6 +22,12 @@ public abstract class Automator implements UiWatcher {
 
     @Override
     public boolean checkForCondition() {
+        BySelector cancelSelector = By.res("com.android.systemui", "send_button");
+        UiObject2 cancel = mDevice.findObject(cancelSelector);
+        if (cancel != null) {
+            cancel.click();
+            return mDevice.wait(Until.gone(cancelSelector), WAIT_TIME);
+        }
         return false;
     }
 

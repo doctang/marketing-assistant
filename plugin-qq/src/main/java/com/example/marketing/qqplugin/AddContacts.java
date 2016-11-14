@@ -26,6 +26,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 
 import com.example.marketing.common.CommonInterface;
 import com.example.marketing.plugin.Automator;
@@ -236,7 +237,7 @@ public class AddContacts extends Automator {
                     phoneNumber = it.next();
                 } else {
                     playAlertRingtone();
-                    break;
+                    return;
                 }
 
                 // 输入电话号码搜索
@@ -256,6 +257,14 @@ public class AddContacts extends Automator {
                     removePhoneNumber(phoneNumber);
                     //i--;
                     continue;
+                } else {
+                    UiObject2 person = mDevice.findObject(By.res(PACKAGE, "title").text("人"));
+                    if (person != null) {
+                        UiObject2 list = person.getParent().getParent();
+                        UiObject2 item = list.findObject(By.clazz(RelativeLayout.class));
+                        item.clickAndWait(Until.newWindow(), WAIT_TIME);
+                        mDevice.waitForIdle();
+                    }
                 }
 
                 // 点击加好友按钮
