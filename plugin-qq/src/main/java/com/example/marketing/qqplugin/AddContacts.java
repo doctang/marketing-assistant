@@ -235,6 +235,7 @@ public class AddContacts extends Automator {
                 if (it.hasNext()) {
                     phoneNumber = it.next();
                 } else {
+                    playAlertRingtone();
                     break;
                 }
 
@@ -253,22 +254,29 @@ public class AddContacts extends Automator {
                 // 如果没有找到结果则继续搜索下一个电话号码
                 if (mDevice.hasObject(By.desc("没有找到相关结果"))) {
                     removePhoneNumber(phoneNumber);
-                    i--;
+                    //i--;
                     continue;
                 }
 
                 // 点击加好友按钮
                 UiObject2 addHailFellow = mDevice.wait(Until.findObject(By.text("加好友")), WAIT_TIME);
-                assertThat("没有找到加好友按钮", addHailFellow, notNullValue());
+                if (addHailFellow==null)
+                {
+                    //assertThat("没有找到加好友按钮", addHailFellow, notNullValue());
+                    removePhoneNumber(phoneNumber);
+                    continue;
+                }
+
                 addHailFellow.clickAndWait(Until.newWindow(), WAIT_TIME);
                 mDevice.waitForIdle();
 
                 // 拉取验证消息失败时播放警告铃声
                 UiObject2 input = mDevice.wait(Until.findObject(By.clazz(EditText.class)), WAIT_TIME);
-                if (input == null) {
-                    playAlertRingtone();
-                    return;
-                }
+                //if (input == null) {
+                    //playAlertRingtone();
+                    //return;
+                //    continue;
+                //}
 
                 // 根据是否有必填来判断是否需要问答验证问题
                 if ("必填".equals(input.getText())) {
@@ -286,16 +294,25 @@ public class AddContacts extends Automator {
                     mDevice.waitForIdle();
                     i--;
                     continue;
-                } else {
-                    // 输入随机问候语
-                    input.setText(greetings[new Random().nextInt(greetings.length)]);
-                }
+                } ////else {
+
+                //}
 
                 // 点击下一步
                 UiObject2 next = mDevice.findObject(By.res(PACKAGE, "ivTitleBtnRightText").text("下一步"));
-                assertThat("没有找到下一步按钮", next, notNullValue());
-                next.clickAndWait(Until.newWindow(), WAIT_TIME);
-                mDevice.waitForIdle();
+                if (next!=null) {
+                    // 输入随机问候语
+
+                    if (input!=null) {
+
+                        input.setText(greetings[new Random().nextInt(greetings.length)]);
+                        sleep();
+                    }
+                        next.clickAndWait(Until.newWindow(), WAIT_TIME);
+                        mDevice.waitForIdle();
+
+                }
+                sleep();
 
                 // 点击发送
                 UiObject2 send = mDevice.findObject(By.res(PACKAGE, "ivTitleBtnRightText").text("发送"));
@@ -308,9 +325,22 @@ public class AddContacts extends Automator {
 
                 // 点击返回
                 UiObject2 back = mDevice.findObject(By.res(PACKAGE, "ivTitleBtnLeft").text("返回"));
-                assertThat("没有找到返回按钮", back, notNullValue());
-                back.clickAndWait(Until.newWindow(), WAIT_TIME);
-                mDevice.waitForIdle();
+                //assertThat("没有找到返回按钮", back, notNullValue());
+                if (back==null) {
+                    mDevice.pressBack();
+                    mDevice.waitForIdle();
+                    sleep(10000);
+                    mDevice.pressBack();
+                    mDevice.waitForIdle();
+                    sleep(10000);
+                    mDevice.pressBack();
+                    mDevice.waitForIdle();
+                    sleep(10000);
+                }
+                if (back!=null) {
+                    back.clickAndWait(Until.newWindow(), WAIT_TIME);
+                    mDevice.waitForIdle();
+                }
             }
 
             // 切卡及数据业务
@@ -386,7 +416,9 @@ public class AddContacts extends Automator {
                 last.click();
                 mDevice.wait(Until.hasObject(By.text("关联QQ号，同时接收多个帐号的消息。")), WAIT_TIME);
             } else {
-                break;
+                //break;
+                sleep(170000);//一轮qq走完，休息接近半个小时
+                addedAccountList.clear();
             }
         }
     }
